@@ -6,7 +6,7 @@ const storage = multer.diskStorage({
         let folder ;
         req.originalUrl.includes('files') ? folder = 'files' : folder = 'users'  
 
-        const destFile = path.resolve(`public/upload/${folder}`);
+        const destFile = path.resolve(`public/images/${folder}`);
         cb(null,destFile)
     },
     filename:(req, file, cb)=>{
