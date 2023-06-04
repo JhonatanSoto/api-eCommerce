@@ -19,7 +19,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(
   cors({
-    origin: "*",
+    origin: process.env.ALLOWED_ORIGIN,
+    methods: 'GET,POST,PUT,DELETE'
   })
 );
 
