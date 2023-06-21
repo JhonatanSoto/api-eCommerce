@@ -15,7 +15,7 @@ export const login = async (req, res) => {
 
       return res.status(apiResponseHandler.meta['status']).json(apiResponseHandler.getApiResponse());
     }
-
+    console.log(response);
     const errorHandler = new ErrorHandler(
       "No token provider",
       400,

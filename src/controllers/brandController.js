@@ -12,8 +12,8 @@ export const getAllBrands = async (req, res) => {
     const brands = await getBrands();
     const apiResponseHandler = new ApiResponseHandler();
     apiResponseHandler.setMeta("status", 200);
-    apiResponseHandler.setMeta("url", req.url);
-    apiResponseHandler.setData("data", brands);
+    apiResponseHandler.setMeta("url", req.originalUrl);
+    apiResponseHandler.setData("brands", brands);
     return res.status(200).json(apiResponseHandler.getApiResponse());
   } catch (error) {
     const errorHandler = new ErrorHandler(

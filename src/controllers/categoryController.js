@@ -14,7 +14,7 @@ export const getAllCategories = async (req, res) => {
     const apiResponseHandler = new ApiResponseHandler();
     apiResponseHandler.setMeta("status", 200);
     apiResponseHandler.setMeta("url", req.originalUrl);
-    apiResponseHandler.setData("data", categories);
+    apiResponseHandler.setData("categories", categories);
     return res.status(200).json(apiResponseHandler.getApiResponse());
   } catch (error) {
     const errorHandler = new ErrorHandler(

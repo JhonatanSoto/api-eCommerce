@@ -40,10 +40,14 @@ const productsSchema = new Schema(
         type:mongoose.Schema.Types.ObjectId,
         ref:'File'
       }],
+    stock:{
+      type:Number
+    },
     active:{
       type: Boolean,
       default: false
     }
+
   },
   {
     timestamps: true,

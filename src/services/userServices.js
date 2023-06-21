@@ -5,6 +5,7 @@ import { getRoleByName } from "./roleServices.js";
 import ErrorHandler from "../helpers/ErrorHandler.js";
 
 export const createUser = async (data, file) => {
+  console.log(data);
   try {
     data.password = await encryptPassword(data.password);
     let role = data.role ? await getRoleByName(data.role) : null;
@@ -16,7 +17,7 @@ export const createUser = async (data, file) => {
     return newUser;
   } catch (error) {
     console.log(error);
-    throw new ErrorHandler("Server Internal error", 500, null,error.message);
+    throw new ErrorHandler("Server Internal error", 500, null, error.message);
   }
 };
 
@@ -28,13 +29,12 @@ export const getUserByEmail = async (email) => {
     return userFound;
   } catch (error) {
     throw new ErrorHandler("Server Internal", 500, error.message);
-
   }
 };
 
 export const getUserById = async (userId) => {
   try {
-    const user = await Users.findById(userId,{password:0})
+    const user = await Users.findById(userId, { password: 0 })
       .populate({ path: "role" })
       .exec();
     return user;
@@ -43,29 +43,41 @@ export const getUserById = async (userId) => {
   }
 };
 export const updateUserServices = async (userId, data) => {
+  console.log(data);
   try {
     const userUpdateSave = await Users.findByIdAndUpdate(
       userId,
       { ...data },
-      { new: true }
+      { new: true, select: "-password" }
     );
     const userUpdated = await userUpdateSave.save();
     console.log(userUpdated);
     return userUpdated;
   } catch (error) {
     throw new ErrorHandler("Server Internal", 500, error.message);
-    
+  }
+};
+export const updateFileUserServices = async (userId, file) => {
+  try {
+    const userUpdateSave = await Users.findByIdAndUpdate(userId, { file },{new:true,select:'-password'});
+    return await userUpdateSave.save();
+  } catch (error) {
+    throw new ErrorHandler("Server Internal", 500, error.message);
   }
 };
 
-export const restorePasswordServices = async (userId, password, newPassword) => {
+export const restorePasswordServices = async (
+  userId,
+  password,
+  newPassword
+) => {
   try {
-    const user = await getUserById(userId);
+    const user = await Users.findById(userId);
     const mathPassword = await comparePassword(password, user.password);
     if (!mathPassword)
       return {
         error: {
-          message: "Invalid Credentials",
+          message: "password is wrong",
         },
       };
     const newPasswordHash = await encryptPassword(newPassword);
@@ -74,16 +86,13 @@ export const restorePasswordServices = async (userId, password, newPassword) => 
     return await user.save();
   } catch (error) {
     throw new ErrorHandler("Server Internal", 500, error.message);
-
   }
 };
 
-export const deleteUserServices = async(userId)=>{  
+export const deleteUserServices = async (userId) => {
   try {
     return await Users.findByIdAndDelete(userId);
-
   } catch (error) {
     throw new ErrorHandler("Server Internal", 500, error.message);
-
   }
-}
+};

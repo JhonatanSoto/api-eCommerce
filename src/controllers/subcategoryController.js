@@ -10,11 +10,10 @@ import ApiResponseHandler from "../helpers/ApiResponseHandler.js";
 export const getAllSubcategories = async (req, res) => {
   try {
     const subcategories = await getSubcategories();
-    console.log(subcategories);
     const apiResponseHandler = new ApiResponseHandler();
     apiResponseHandler.setMeta("status", 200);
     apiResponseHandler.setMeta("url", req.originalUrl);
-    apiResponseHandler.setData("data", subcategories);
+    apiResponseHandler.setData("subcategories", subcategories);
     return res.status(200).json(apiResponseHandler.getApiResponse());
   } catch (error) {
     const errorHandler = new ErrorHandler(

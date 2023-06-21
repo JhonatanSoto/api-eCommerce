@@ -5,6 +5,7 @@ import {
   updateUserServices,
   restorePasswordServices,
   deleteUserServices,
+  updateFileUserServices,
 } from "../services/userServices.js";
 import ErrorHandler from "../helpers/ErrorHandler.js";
 import ApiResponseHandler from "../helpers/ApiResponseHandler.js";
@@ -12,9 +13,7 @@ import ApiResponseHandler from "../helpers/ApiResponseHandler.js";
 export const createAcount = async (req, res) => {
   try {
     const { email } = req.body;
-
     const userFound = await getUserByEmail(email);
-    console.log(userFound);
     if (userFound) {
       const errorHandler = new ErrorHandler(
         "The email is already registered",
@@ -23,10 +22,9 @@ export const createAcount = async (req, res) => {
       );
       return res.status(400).json(errorHandler.getResponseError());
     }
-
     const newUser = await createUser(
       req.body,
-      req.file ? req.file.filename : "usuarioDefault.jpg"
+      req.file ? req.file.filename : "usuarioDefault.png"
     );
     if (newUser.error) {
       const errorHandler = new ErrorHandler(
@@ -75,7 +73,7 @@ export const getProfile = async (req, res) => {
     const apiResponseHandler = new ApiResponseHandler();
     apiResponseHandler.setMeta("status", 200);
     apiResponseHandler.setMeta("url", "api/user/profile");
-    apiResponseHandler.setData(data, user);
+    apiResponseHandler.setData('user',user)
     return res
       .status(apiResponseHandler.meta["status"])
       .json(apiResponseHandler.getApiResponse());
@@ -94,19 +92,18 @@ export const getProfile = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { firtsName, lastName } = req.body;
-    const file = req.file;
+    console.log(req.body);
+    const { firstName, lastName } = req.body;
     const data = {
-      firtsName,
+      firstName,
       lastName,
-      file: file.filename,
     };
-    const { userId } = req.params;
-    const updatedUser = await updateUserServices(userId, data);
+    const { id } = req.user;
+    const updatedUser = await updateUserServices(id, data);
     const apiResponseHandler = new ApiResponseHandler();
     apiResponseHandler.setMeta("status", 200);
     apiResponseHandler.setMeta("url", "api/user/update");
-    apiResponseHandler.setMeta("data", updatedUser);
+    apiResponseHandler.setData("data", updatedUser);
 
     return res
       .status(apiResponseHandler.meta["status"])
@@ -126,15 +123,15 @@ export const updateProfile = async (req, res) => {
 
 export const restorePassword = async (req, res) => {
   try {
+    console.log(req.body,'req.body');
     const { password, newPassword } = req.body;
-    const { userId } = req.params;
+    const { id } = req.user
 
     const response = await restorePasswordServices(
-      userId,
+      id,
       password,
       newPassword
     );
-    console.log(response);
     if (response.error) {
       const errorHandler = new ErrorHandler(
         response.error.message,
@@ -165,11 +162,37 @@ export const restorePassword = async (req, res) => {
       .json(errorHandler.getResponseError());
   }
 };
+export const updateFileUser  =async( req, res) =>{
+  try {
+    const file = req.file;
+    const { id } = req.user;
+    const updatedUser = await updateFileUserServices(id, file.filename);
+    const apiResponseHandler = new ApiResponseHandler();
+    apiResponseHandler.setMeta("status", 200);
+    apiResponseHandler.setMeta("url", "api/user/update-file");
+    apiResponseHandler.setData("message", 'file updated successfully!');
+    apiResponseHandler.setData("user", updatedUser);
+
+    return res
+      .status(apiResponseHandler.meta["status"])
+      .json(apiResponseHandler.getApiResponse());
+  } catch (error) {
+    const errorHandler = new ErrorHandler(
+      "Server Internal Error",
+      500,
+      "api/user/update",
+      error.details
+    );
+    return res
+      .status(errorHandler.statusCode)
+      .json(errorHandler.getResponseError());
+  }
+}
 
 export const deleteUser = async (req, res) => {
   try {
-    const { userId } = req.params;
-    await deleteUserServices(userId);
+    const { id } = req.user;
+    await deleteUserServices(id);
     const apiResponseHandler = new ApiResponseHandler();
     apiResponseHandler.setMeta("status", 200);
     apiResponseHandler.setMeta("url", "api/user/delete");

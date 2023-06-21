@@ -9,18 +9,19 @@ import subcategoryRouters from "./routers/subcategoryRouters.js";
 import fileRouters from "./routers/fileRouters.js";
 import productRouters from "./routers/productRouters.js";
 import cors from "cors";
+import path from 'path'
 
 dotenv.config();
 mongoConnection();
 
 const PORT = process.env.PORT || 3030;
 const app = express();
+app.use(express.static(path.resolve('public')))
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(
   cors({
-    origin: process.env.ALLOWED_ORIGIN,
-    methods: 'GET,POST,PUT,DELETE'
+    origin: '*',
   })
 );
 
